@@ -5,7 +5,8 @@ var PassportConfigurator =
 
 var app = module.exports = loopback();
 
-app.use(loopback.session({ secret: 'keyboard cat' }));
+// Create an instance of PassportConfigurator with the app instance
+var passportConfigurator = new PassportConfigurator(app);
 
 app.start = function() {
   // start the web server
@@ -20,8 +21,17 @@ app.start = function() {
 boot(app, __dirname, function(err) {
   if (err) throw err;
 
-  // Create an instance of PassportConfigurator with the app instance
-  var passportConfigurator = new PassportConfigurator(app);
+  app.middleware('session:before', loopback.cookieParser('test secret'));
+  app.middleware('session', loopback.session({
+    secret: 'other test secret',
+    saveUninitialized: true,
+    resave: true
+  }));
+  app.middleware('auth', loopback.token({
+    model: app.models.accessToken,
+    currentUserLiteral: 'me'
+  }));
+
   passportConfigurator.init();
   passportConfigurator.setupModels({
     userModel: app.models.User,
@@ -30,6 +40,10 @@ boot(app, __dirname, function(err) {
   });
   passportConfigurator.configureProvider('facebook-login',
     require('../providers.json')['facebook-login']);
+
+  app.get('/auth/token', function(req, res) {
+    res.json({ token: req.accessToken && req.accessToken.id });
+  });
 
   // start the server if `$ node server.js`
   if (require.main === module)

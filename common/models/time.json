@@ -1,0 +1,23 @@
+{
+  "name": "Time",
+  "plural": "Times",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "milliseconds": {
+      "type": "number",
+      "required": true
+    },
+    "tag": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": []
+}

@@ -14,7 +14,9 @@
   },
   "session": {},
   "auth": {},
-  "parse": {},
+  "parse": {
+    "body-parser#json": {}
+  },
   "routes": {},
   "files": {},
   "final": {

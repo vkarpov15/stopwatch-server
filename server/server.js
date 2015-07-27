@@ -32,6 +32,32 @@ boot(app, __dirname, function(err) {
     currentUserLiteral: 'me'
   }));
 
+  app.middleware('auth:after', function(req, res, next) {
+    if (!req.accessToken) {
+      return next();
+    }
+
+    req.accessToken.user(function(error, user) {
+      if (error) {
+        return next(error);
+      }
+      req.user = user;
+      next();
+    });
+  });
+
+  app.middleware('parse:after', function(req, res, next) {
+    if (!req.user) {
+      return next();
+    }
+    if (req.method !== 'POST' || req.path !== '/api/Times') {
+      return next();
+    }
+
+    req.body.userId = req.user.id;
+    next();
+  });
+
   passportConfigurator.init();
   passportConfigurator.setupModels({
     userModel: app.models.User,
